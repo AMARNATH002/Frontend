@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import ProductCard from './components/ProductCard'
 import './Home.css'
-
+const API = import.meta.env.VITE_URL || 'http://localhost:5000'
 const Home = ({ addToCart, user, onLogin }) => {
   const [foods, setFoods] = useState([])
   const [loading, setLoading] = useState(true)
@@ -32,7 +32,7 @@ const Home = ({ addToCart, user, onLogin }) => {
 
   const fetchFoods = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/foods')
+      const response = await axios.get(`${API}/api/foods`)
       setFoods(response.data)
       setLoading(false)
     } catch (error) {
@@ -44,7 +44,7 @@ const Home = ({ addToCart, user, onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:5000/api/login', loginData)
+      const response = await axios.post(`${API}/api/login`, loginData)
       onLogin(response.data.user, response.data.token)
       setShowLoginModal(false)
       setLoginData({ email: '', password: '' })
@@ -57,7 +57,7 @@ const Home = ({ addToCart, user, onLogin }) => {
   const handleRegister = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:5000/api/register', registerData)
+      const response = await axios.post(`${API}/api/register`, registerData)
       onLogin(response.data.user, response.data.token)
       setShowRegisterModal(false)
       setRegisterData({ name: '', email: '', password: '', phone: '', address: '' })

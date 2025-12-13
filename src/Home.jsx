@@ -57,7 +57,7 @@ const Home = ({ addToCart, user, onLogin }) => {
   const handleRegister = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(`${API}/api/register`, registerData)
+      const response = await axios.post(`${config.API_BASE_URL}/api/register`, registerData)
       onLogin(response.data.user, response.data.token)
       setShowRegisterModal(false)
       setRegisterData({ name: '', email: '', password: '', phone: '', address: '' })

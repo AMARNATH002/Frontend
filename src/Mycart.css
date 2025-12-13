@@ -86,8 +86,8 @@
 .quantity-btn {
   width: 35px;
   height: 35px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid #1c1850;
+  background: rgb(33, 47, 201);
   border-radius: 50%;
   cursor: pointer;
   display: flex;

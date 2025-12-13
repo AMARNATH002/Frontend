@@ -6,7 +6,7 @@ const Navbar = ({ cartItemsCount, user, onLogout }) => {
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
-          TOMATO 
+          🍛 TOMATO 🚚
         </Link>
         
         <div className="nav-menu">

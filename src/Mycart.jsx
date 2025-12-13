@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
+import config from './config'
 import './Mycart.css'
 
 const Mycart = ({ cartItems, removeFromCart, updateQuantity, clearCart, user }) => {

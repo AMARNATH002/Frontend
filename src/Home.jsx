@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import ProductCard from './components/ProductCard'
+import config from './config'
 import './Home.css'
-const API = import.meta.env.VITE_URL || 'http://localhost:5000'
 const Home = ({ addToCart, user, onLogin }) => {
   const [foods, setFoods] = useState([])
   const [loading, setLoading] = useState(true)
@@ -32,7 +32,7 @@ const Home = ({ addToCart, user, onLogin }) => {
 
   const fetchFoods = async () => {
     try {
-      const response = await axios.get(`${API}/api/foods`)
+      const response = await axios.get(`${config.API_BASE_URL}/api/foods`)
       setFoods(response.data)
       setLoading(false)
     } catch (error) {
@@ -44,7 +44,7 @@ const Home = ({ addToCart, user, onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(`${API}/api/login`, loginData)
+      const response = await axios.post(`${config.API_BASE_URL}/api/login`, loginData)
       onLogin(response.data.user, response.data.token)
       setShowLoginModal(false)
       setLoginData({ email: '', password: '' })

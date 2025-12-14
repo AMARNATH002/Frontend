@@ -3,7 +3,7 @@ import axios from 'axios'
 import ProductCard from './components/ProductCard'
 import config from './config'
 import './Home.css'
-const Home = ({ addToCart, user, onLogin }) => {
+const Home = ({ addToCart, user, onLogin, showAlert }) => {
   const [foods, setFoods] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -68,12 +68,12 @@ const Home = ({ addToCart, user, onLogin }) => {
     
     // Validation
     if (!validateEmail(loginData.email)) {
-      alert('Please enter a valid email address')
+      showAlert('Please enter a valid email address', 'warning')
       return
     }
     
     if (!validatePassword(loginData.password)) {
-      alert('Password must be at least 6 characters long')
+      showAlert('Password must be at least 6 characters long', 'warning')
       return
     }
     
@@ -82,9 +82,9 @@ const Home = ({ addToCart, user, onLogin }) => {
       onLogin(response.data.user, response.data.token)
       setShowLoginModal(false)
       setLoginData({ email: '', password: '' })
-      alert('Login successful!')
+      showAlert('Login successful!', 'success')
     } catch (error) {
-      alert(error.response?.data?.message || 'Login failed')
+      showAlert(error.response?.data?.message || 'Login failed', 'error')
     }
   }
 
@@ -93,27 +93,27 @@ const Home = ({ addToCart, user, onLogin }) => {
     
     // Validation
     if (!validateName(registerData.name)) {
-      alert('Name must be at least 2 characters long')
+      showAlert('Name must be at least 2 characters long', 'warning')
       return
     }
     
     if (!validateEmail(registerData.email)) {
-      alert('Please enter a valid email address')
+      showAlert('Please enter a valid email address', 'warning')
       return
     }
     
     if (!validatePassword(registerData.password)) {
-      alert('Password must be at least 6 characters long')
+      showAlert('Password must be at least 6 characters long', 'warning')
       return
     }
     
     if (!validatePhone(registerData.phone)) {
-      alert('Please enter a valid 10-digit phone number')
+      showAlert('Please enter a valid 10-digit phone number', 'warning')
       return
     }
     
     if (registerData.address.trim().length < 10) {
-      alert('Please enter a complete address (at least 10 characters)')
+      showAlert('Please enter a complete address (at least 10 characters)', 'warning')
       return
     }
     
@@ -122,9 +122,9 @@ const Home = ({ addToCart, user, onLogin }) => {
       onLogin(response.data.user, response.data.token)
       setShowRegisterModal(false)
       setRegisterData({ name: '', email: '', password: '', phone: '', address: '' })
-      alert('Registration successful!')
+      showAlert('Registration successful!', 'success')
     } catch (error) {
-      alert(error.response?.data?.message || 'Registration failed')
+      showAlert(error.response?.data?.message || 'Registration failed', 'error')
     }
   }
 
@@ -187,6 +187,7 @@ const Home = ({ addToCart, user, onLogin }) => {
                 product={food}
                 onAddToCart={addToCart}
                 user={user}
+                showAlert={showAlert}
               />
             ))}
           </div>

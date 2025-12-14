@@ -1,9 +1,9 @@
 import './ProductCard.css'
 
-const ProductCard = ({ product, onAddToCart, user }) => {
+const ProductCard = ({ product, onAddToCart, user, showAlert }) => {
   const handleAddToCart = () => {
     if (!user) {
-      alert('Please login to add items to cart')
+      showAlert('Please login to add items to cart', 'warning')
       return
     }
     onAddToCart(product)

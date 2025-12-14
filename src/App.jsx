@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
+import Alert from './components/Alert'
 import Home from './Home'
 import About from './About'
 import Contact from './Contact'
@@ -12,6 +13,7 @@ import './App.css'
 function App() {
   const [cartItems, setCartItems] = useState([])
   const [user, setUser] = useState(null)
+  const [alert, setAlert] = useState({ show: false, message: '', type: 'success' })
 
   useEffect(() => {
     
@@ -33,16 +35,26 @@ function App() {
     localStorage.setItem('cart', JSON.stringify(cartItems))
   }, [cartItems])
 
+  const showAlert = (message, type = 'success') => {
+    setAlert({ show: true, message, type })
+  }
+
+  const hideAlert = () => {
+    setAlert({ show: false, message: '', type: 'success' })
+  }
+
   const addToCart = (item) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(cartItem => cartItem.id === item.id)
       if (existingItem) {
+        showAlert(`${item.name} quantity updated in cart!`, 'success')
         return prevItems.map(cartItem =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         )
       } else {
+        showAlert(`${item.name} added to cart successfully!`, 'success')
         return [...prevItems, { ...item, quantity: 1 }]
       }
     })
@@ -89,6 +101,12 @@ function App() {
         user={user}
         onLogout={logout}
       />
+      <Alert 
+        show={alert.show}
+        message={alert.message}
+        type={alert.type}
+        onClose={hideAlert}
+      />
       <Routes>
         <Route 
           path="/" 
@@ -97,6 +115,7 @@ function App() {
               addToCart={addToCart} 
               user={user} 
               onLogin={login}
+              showAlert={showAlert}
             />
           } 
         />
@@ -115,7 +134,7 @@ function App() {
           } 
         />
         <Route path="/order-success" element={<OrderSuccess />} />
-        <Route path="/orders" element={<Orders user={user} />} />
+        <Route path="/orders" element={<Orders user={user} showAlert={showAlert} />} />
       </Routes>
     </div>
   )

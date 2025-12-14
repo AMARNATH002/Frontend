@@ -3,10 +3,11 @@ import axios from 'axios'
 import config from './config'
 import './Orders.css'
 
-const Orders = ({ user }) => {
+const Orders = ({ user, showAlert }) => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [cancellingOrder, setCancellingOrder] = useState(null)
 
   useEffect(() => {
     if (user) {
@@ -32,12 +33,44 @@ const Orders = ({ user }) => {
     }
   }
 
+  const cancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return
+    }
+
+    setCancellingOrder(orderId)
+    try {
+      const token = localStorage.getItem('token')
+      await axios.put(`${config.API_BASE_URL}/api/orders/${orderId}/cancel`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      
+      // Update the order status in the local state
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === orderId 
+            ? { ...order, status: 'cancelled' }
+            : order
+        )
+      )
+      
+      showAlert('Order cancelled successfully!', 'success')
+    } catch (error) {
+      showAlert(error.response?.data?.message || 'Failed to cancel order', 'error')
+    } finally {
+      setCancellingOrder(null)
+    }
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return '#ff9800'
       case 'confirmed': return '#2196f3'
       case 'preparing': return '#ff5722'
       case 'delivered': return '#4caf50'
+      case 'cancelled': return '#f44336'
       default: return '#666'
     }
   }
@@ -128,8 +161,19 @@ const Orders = ({ user }) => {
                   <div className="delivery-info">
                     <strong>Delivery to:</strong> {order.deliveryAddress}
                   </div>
-                  <div className="order-total">
-                    <strong>Total: ₹{order.totalAmount}</strong>
+                  <div className="order-actions">
+                    <div className="order-total">
+                      <strong>Total: ₹{order.totalAmount}</strong>
+                    </div>
+                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                      <button 
+                        className="cancel-order-btn"
+                        onClick={() => cancelOrder(order._id)}
+                        disabled={cancellingOrder === order._id}
+                      >
+                        {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel Order'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

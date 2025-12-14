@@ -26,6 +26,9 @@ const Home = ({ addToCart, user, onLogin }) => {
     address: ''
   })
 
+  // Validation error states
+  const [validationErrors, setValidationErrors] = useState({})
+
   useEffect(() => {
     fetchFoods()
   }, [])
@@ -41,8 +44,39 @@ const Home = ({ addToCart, user, onLogin }) => {
     }
   }
 
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/
+    return phoneRegex.test(phone.replace(/\D/g, ''))
+  }
+
+  const validateName = (name) => {
+    return name.trim().length >= 2
+  }
+
+  const validatePassword = (password) => {
+    return password.length >= 6
+  }
+
   const handleLogin = async (e) => {
     e.preventDefault()
+    
+    // Validation
+    if (!validateEmail(loginData.email)) {
+      alert('Please enter a valid email address')
+      return
+    }
+    
+    if (!validatePassword(loginData.password)) {
+      alert('Password must be at least 6 characters long')
+      return
+    }
+    
     try {
       const response = await axios.post(`${config.API_BASE_URL}/api/login`, loginData)
       onLogin(response.data.user, response.data.token)
@@ -56,6 +90,33 @@ const Home = ({ addToCart, user, onLogin }) => {
 
   const handleRegister = async (e) => {
     e.preventDefault()
+    
+    // Validation
+    if (!validateName(registerData.name)) {
+      alert('Name must be at least 2 characters long')
+      return
+    }
+    
+    if (!validateEmail(registerData.email)) {
+      alert('Please enter a valid email address')
+      return
+    }
+    
+    if (!validatePassword(registerData.password)) {
+      alert('Password must be at least 6 characters long')
+      return
+    }
+    
+    if (!validatePhone(registerData.phone)) {
+      alert('Please enter a valid 10-digit phone number')
+      return
+    }
+    
+    if (registerData.address.trim().length < 10) {
+      alert('Please enter a complete address (at least 10 characters)')
+      return
+    }
+    
     try {
       const response = await axios.post(`${config.API_BASE_URL}/api/register`, registerData)
       onLogin(response.data.user, response.data.token)
@@ -146,18 +207,42 @@ const Home = ({ addToCart, user, onLogin }) => {
                 <input
                   type="email"
                   value={loginData.email}
-                  onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setLoginData({...loginData, email: value})
+                    if (value && !validateEmail(value)) {
+                      setValidationErrors({...validationErrors, loginEmail: 'Please enter a valid email address'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.loginEmail
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.loginEmail ? 'error' : loginData.email && validateEmail(loginData.email) ? 'success' : ''}
                   required
                 />
+                {validationErrors.loginEmail && <div className="validation-error">{validationErrors.loginEmail}</div>}
               </div>
               <div className="form-group">
                 <label>Password:</label>
                 <input
                   type="password"
                   value={loginData.password}
-                  onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setLoginData({...loginData, password: value})
+                    if (value && !validatePassword(value)) {
+                      setValidationErrors({...validationErrors, loginPassword: 'Password must be at least 6 characters'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.loginPassword
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.loginPassword ? 'error' : loginData.password && validatePassword(loginData.password) ? 'success' : ''}
                   required
                 />
+                {validationErrors.loginPassword && <div className="validation-error">{validationErrors.loginPassword}</div>}
               </div>
               <div className="modal-buttons">
                 <button type="submit" className="btn btn-primary">Login</button>
@@ -197,45 +282,108 @@ const Home = ({ addToCart, user, onLogin }) => {
                 <input
                   type="text"
                   value={registerData.name}
-                  onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setRegisterData({...registerData, name: value})
+                    if (value && !validateName(value)) {
+                      setValidationErrors({...validationErrors, name: 'Name must be at least 2 characters'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.name
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.name ? 'error' : registerData.name && validateName(registerData.name) ? 'success' : ''}
                   required
                 />
+                {validationErrors.name && <div className="validation-error">{validationErrors.name}</div>}
               </div>
               <div className="form-group">
                 <label>Email:</label>
                 <input
                   type="email"
                   value={registerData.email}
-                  onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setRegisterData({...registerData, email: value})
+                    if (value && !validateEmail(value)) {
+                      setValidationErrors({...validationErrors, email: 'Please enter a valid email address'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.email
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.email ? 'error' : registerData.email && validateEmail(registerData.email) ? 'success' : ''}
                   required
                 />
+                {validationErrors.email && <div className="validation-error">{validationErrors.email}</div>}
               </div>
               <div className="form-group">
                 <label>Password:</label>
                 <input
                   type="password"
                   value={registerData.password}
-                  onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setRegisterData({...registerData, password: value})
+                    if (value && !validatePassword(value)) {
+                      setValidationErrors({...validationErrors, password: 'Password must be at least 6 characters'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.password
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.password ? 'error' : registerData.password && validatePassword(registerData.password) ? 'success' : ''}
                   required
                 />
+                {validationErrors.password && <div className="validation-error">{validationErrors.password}</div>}
               </div>
               <div className="form-group">
                 <label>Phone:</label>
                 <input
                   type="tel"
                   value={registerData.phone}
-                  onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '') // Only allow numbers
+                    setRegisterData({...registerData, phone: value})
+                    if (value && !validatePhone(value)) {
+                      setValidationErrors({...validationErrors, phone: 'Please enter a valid 10-digit phone number'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.phone
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.phone ? 'error' : registerData.phone && validatePhone(registerData.phone) ? 'success' : ''}
+                  placeholder="1234567890"
+                  maxLength="10"
                   required
                 />
+                {validationErrors.phone && <div className="validation-error">{validationErrors.phone}</div>}
               </div>
               <div className="form-group">
                 <label>Address:</label>
                 <textarea
                   value={registerData.address}
-                  onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setRegisterData({...registerData, address: value})
+                    if (value && value.trim().length < 10) {
+                      setValidationErrors({...validationErrors, address: 'Address must be at least 10 characters'})
+                    } else {
+                      const newErrors = {...validationErrors}
+                      delete newErrors.address
+                      setValidationErrors(newErrors)
+                    }
+                  }}
+                  className={validationErrors.address ? 'error' : registerData.address && registerData.address.trim().length >= 10 ? 'success' : ''}
+                  placeholder="Enter your complete address"
                   required
                   rows="3"
                 />
+                {validationErrors.address && <div className="validation-error">{validationErrors.address}</div>}
               </div>
               <div className="modal-buttons">
                 <button type="submit" className="btn btn-primary">Register</button>

@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import config from './config'
 import './Mycart.css'
 
 const Mycart = ({ cartItems, removeFromCart, updateQuantity, clearCart, user }) => {
+  const navigate = useNavigate()
   const [showCheckout, setShowCheckout] = useState(false)
   const [orderData, setOrderData] = useState({
     deliveryAddress: '',
@@ -18,10 +20,26 @@ const Mycart = ({ cartItems, removeFromCart, updateQuantity, clearCart, user }) 
     updateQuantity(itemId, newQuantity)
   }
 
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/
+    return phoneRegex.test(phone.replace(/\D/g, ''))
+  }
+
   const handleCheckout = async (e) => {
     e.preventDefault()
     if (!user) {
       alert('Please login to place an order')
+      return
+    }
+
+    // Validation
+    if (orderData.deliveryAddress.trim().length < 10) {
+      alert('Please enter a complete delivery address (at least 10 characters)')
+      return
+    }
+
+    if (!validatePhone(orderData.phone)) {
+      alert('Please enter a valid 10-digit phone number')
       return
     }
 
@@ -35,7 +53,7 @@ const Mycart = ({ cartItems, removeFromCart, updateQuantity, clearCart, user }) 
         image: item.image
       }))
 
-      await axios.post('http://localhost:5000/api/orders', {
+      const response = await axios.post(`${config.API_BASE_URL}/api/orders`, {
         items: orderItems,
         totalAmount,
         deliveryAddress: orderData.deliveryAddress,
@@ -46,12 +64,38 @@ const Mycart = ({ cartItems, removeFromCart, updateQuantity, clearCart, user }) 
         }
       })
 
-      alert('Order placed successfully!')
+      // Navigate to success page with order data
+      navigate('/order-success', {
+        state: {
+          orderData: {
+            orderId: response.data.order._id,
+            items: orderItems,
+            totalAmount,
+            deliveryAddress: orderData.deliveryAddress,
+            phone: orderData.phone
+          }
+        }
+      })
+
       clearCart()
       setShowCheckout(false)
       setOrderData({ deliveryAddress: '', phone: '' })
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to place order')
+      console.error('Order placement error:', error)
+      let errorMessage = 'Failed to place order. '
+      
+      if (error.response) {
+        // Server responded with error status
+        errorMessage += error.response.data?.message || `Server error: ${error.response.status}`
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'Unable to connect to server. Please check your internet connection.'
+      } else {
+        // Something else happened
+        errorMessage += error.message
+      }
+      
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }

@@ -154,6 +154,31 @@ body {
   margin-bottom: 20px;
 }
 
+/* Validation styles */
+.form-group input.error,
+.form-group textarea.error {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.form-group input.success,
+.form-group textarea.success {
+  border-color: #28a745;
+  background-color: #f8fff8;
+}
+
+.validation-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 5px;
+}
+
+.validation-success {
+  color: #28a745;
+  font-size: 0.875rem;
+  margin-top: 5px;
+}
+
 /* Success message */
 .success {
   color: #155724;

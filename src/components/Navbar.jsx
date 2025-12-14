@@ -13,6 +13,7 @@ const Navbar = ({ cartItemsCount, user, onLogout }) => {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/about" className="nav-link">About</Link>
           <Link to="/contact" className="nav-link">Contact</Link>
+          {user && <Link to="/orders" className="nav-link">My Orders</Link>}
           <Link to="/cart" className="nav-link cart-link">
             🛒 Cart ({cartItemsCount})
           </Link>

@@ -5,6 +5,8 @@ import Home from './Home'
 import About from './About'
 import Contact from './Contact'
 import Mycart from './Mycart'
+import OrderSuccess from './OrderSuccess'
+import Orders from './Orders'
 import './App.css'
 
 function App() {
@@ -112,6 +114,8 @@ function App() {
             />
           } 
         />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/orders" element={<Orders user={user} />} />
       </Routes>
     </div>
   )
